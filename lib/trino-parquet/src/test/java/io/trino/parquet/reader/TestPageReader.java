@@ -15,7 +15,7 @@ package io.trino.parquet.reader;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import io.airlift.compress.snappy.SnappyCompressor;
+import io.airlift.compressor.snappy.SnappyCompressor;
 import io.airlift.slice.Slice;
 import io.airlift.slice.Slices;
 import io.trino.parquet.DataPage;
@@ -375,7 +375,7 @@ public class TestPageReader
             return Arrays.copyOfRange(bytes, offset, offset + length);
         }
         if (compressionCodec == SNAPPY) {
-            SnappyCompressor compressor = new SnappyCompressor();
+            SnappyCompressor compressor = SnappyCompressor.create();
             byte[] out = new byte[compressor.maxCompressedLength(length)];
             int compressedSize = compressor.compress(bytes, offset, length, out, 0, out.length);
             return Arrays.copyOf(out, compressedSize);
