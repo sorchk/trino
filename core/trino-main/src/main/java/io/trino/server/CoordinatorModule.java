@@ -154,11 +154,9 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.weakref.jmx.guice.ExportBinder.newExporter;
 
 public class CoordinatorModule
-        extends AbstractConfigurationAwareModule
-{
+        extends AbstractConfigurationAwareModule {
     @Override
-    protected void setup(Binder binder)
-    {
+    protected void setup(Binder binder) {
         install(new WebUiModule());
 
         // coordinator announcement
@@ -201,7 +199,8 @@ public class CoordinatorModule
         newExporter(binder).export(SqlQueryManager.class).withGeneratedName();
         binder.bind(QueryManager.class).to(SqlQueryManager.class);
         binder.bind(QueryPreparer.class).in(Scopes.SINGLETON);
-        OptionalBinder.newOptionalBinder(binder, SessionSupplier.class).setDefault().to(QuerySessionSupplier.class).in(Scopes.SINGLETON);
+        OptionalBinder.newOptionalBinder(binder, SessionSupplier.class).setDefault().to(QuerySessionSupplier.class)
+                .in(Scopes.SINGLETON);
         binder.bind(ResourceGroupInfoProvider.class).to(ResourceGroupManager.class).in(Scopes.SINGLETON);
         binder.bind(InternalResourceGroupManager.class).in(Scopes.SINGLETON);
         newExporter(binder).export(InternalResourceGroupManager.class).withGeneratedName();
@@ -211,7 +210,8 @@ public class CoordinatorModule
         // dispatcher
         binder.bind(DispatchManager.class).in(Scopes.SINGLETON);
         // export under the old name, for backwards compatibility
-        newExporter(binder).export(DispatchManager.class).as(generator -> generator.generatedNameOf(QueryManager.class));
+        newExporter(binder).export(DispatchManager.class)
+                .as(generator -> generator.generatedNameOf(QueryManager.class));
         binder.bind(FailedDispatchQueryFactory.class).in(Scopes.SINGLETON);
         binder.bind(DispatchExecutor.class).in(Scopes.SINGLETON);
 
@@ -228,11 +228,13 @@ public class CoordinatorModule
                 }).build());
 
         bindLowMemoryTaskKiller(LowMemoryTaskKillerPolicy.NONE, NoneLowMemoryKiller.class);
-        bindLowMemoryTaskKiller(LowMemoryTaskKillerPolicy.TOTAL_RESERVATION_ON_BLOCKED_NODES, TotalReservationOnBlockedNodesTaskLowMemoryKiller.class);
+        bindLowMemoryTaskKiller(LowMemoryTaskKillerPolicy.TOTAL_RESERVATION_ON_BLOCKED_NODES,
+                TotalReservationOnBlockedNodesTaskLowMemoryKiller.class);
         bindLowMemoryTaskKiller(LowMemoryTaskKillerPolicy.LEAST_WASTE, LeastWastedEffortTaskLowMemoryKiller.class);
         bindLowMemoryQueryKiller(LowMemoryQueryKillerPolicy.NONE, NoneLowMemoryKiller.class);
         bindLowMemoryQueryKiller(LowMemoryQueryKillerPolicy.TOTAL_RESERVATION, TotalReservationLowMemoryKiller.class);
-        bindLowMemoryQueryKiller(LowMemoryQueryKillerPolicy.TOTAL_RESERVATION_ON_BLOCKED_NODES, TotalReservationOnBlockedNodesQueryLowMemoryKiller.class);
+        bindLowMemoryQueryKiller(LowMemoryQueryKillerPolicy.TOTAL_RESERVATION_ON_BLOCKED_NODES,
+                TotalReservationOnBlockedNodesQueryLowMemoryKiller.class);
 
         newExporter(binder).export(ClusterMemoryManager.class).withGeneratedName();
 
@@ -240,7 +242,8 @@ public class CoordinatorModule
         binder.bind(BinPackingNodeAllocatorService.class).in(Scopes.SINGLETON);
         newExporter(binder).export(BinPackingNodeAllocatorService.class).withGeneratedName();
         binder.bind(NodeAllocatorService.class).to(BinPackingNodeAllocatorService.class);
-        binder.bind(PartitionMemoryEstimatorFactory.class).to(NoMemoryAwarePartitionMemoryEstimator.Factory.class).in(Scopes.SINGLETON);
+        binder.bind(PartitionMemoryEstimatorFactory.class).to(NoMemoryAwarePartitionMemoryEstimator.Factory.class)
+                .in(Scopes.SINGLETON);
         binder.bind(PartitionMemoryEstimatorFactory.class)
                 .annotatedWith(ForNoMemoryAwarePartitionMemoryEstimator.class)
                 .to(ExponentialGrowthPartitionMemoryEstimator.Factory.class).in(Scopes.SINGLETON);
@@ -254,10 +257,10 @@ public class CoordinatorModule
         binder.bind(ByEagerParentOutputStatsEstimator.Factory.class).in(Scopes.SINGLETON);
         // use provider method returning list to ensure ordering
         // OutputDataSizeEstimator factories are ordered starting from most accurate
-        install(new AbstractConfigurationAwareModule()
-        {
+        install(new AbstractConfigurationAwareModule() {
             @Override
-            protected void setup(Binder binder) {}
+            protected void setup(Binder binder) {
+            }
 
             @Provides
             @Singleton
@@ -265,9 +268,9 @@ public class CoordinatorModule
             List<OutputStatsEstimatorFactory> getCompositeOutputDataSizeEstimatorDelegateFactories(
                     ByTaskProgressOutputStatsEstimator.Factory byTaskProgressOutputDataSizeEstimatorFactory,
                     BySmallStageOutputStatsEstimator.Factory bySmallStageOutputDataSizeEstimatorFactory,
-                    ByEagerParentOutputStatsEstimator.Factory byEagerParentOutputDataSizeEstimatorFactory)
-            {
-                return ImmutableList.of(byTaskProgressOutputDataSizeEstimatorFactory, bySmallStageOutputDataSizeEstimatorFactory, byEagerParentOutputDataSizeEstimatorFactory);
+                    ByEagerParentOutputStatsEstimator.Factory byEagerParentOutputDataSizeEstimatorFactory) {
+                return ImmutableList.of(byTaskProgressOutputDataSizeEstimatorFactory,
+                        bySmallStageOutputDataSizeEstimatorFactory, byEagerParentOutputDataSizeEstimatorFactory);
             }
         });
 
@@ -281,7 +284,8 @@ public class CoordinatorModule
         // cost calculator
         binder.bind(TaskCountEstimator.class).in(Scopes.SINGLETON);
         binder.bind(CostCalculator.class).to(CostCalculatorUsingExchanges.class).in(Scopes.SINGLETON);
-        binder.bind(CostCalculator.class).annotatedWith(EstimatedExchanges.class).to(CostCalculatorWithEstimatedExchanges.class).in(Scopes.SINGLETON);
+        binder.bind(CostCalculator.class).annotatedWith(EstimatedExchanges.class)
+                .to(CostCalculatorWithEstimatedExchanges.class).in(Scopes.SINGLETON);
         binder.bind(CostComparator.class).in(Scopes.SINGLETON);
 
         // dynamic filtering service
@@ -361,12 +365,22 @@ public class CoordinatorModule
         binder.bind(StageExecutionStats.class).in(Scopes.SINGLETON);
         newExporter(binder).export(StageExecutionStats.class).withGeneratedName();
 
-        MapBinder<String, ExecutionPolicy> executionPolicyBinder = newMapBinder(binder, String.class, ExecutionPolicy.class);
+        MapBinder<String, ExecutionPolicy> executionPolicyBinder = newMapBinder(binder, String.class,
+                ExecutionPolicy.class);
         executionPolicyBinder.addBinding("all-at-once").to(AllAtOnceExecutionPolicy.class);
         executionPolicyBinder.addBinding("phased").to(PhasedExecutionPolicy.class);
 
         install(new QueryExecutionFactoryModule());
-
+        // load extension module
+        ServiceLoader<Module> modules = ServiceLoader.load(Module.class);
+        log.info("load extension modules:" + modules);
+        modules.stream().forEach(item -> {
+            Module module = item.get();
+            log.info("load extension module:" + module);
+            if (module != null) {
+                install(module);
+            }
+        });
         // cleanup
         closingBinder(binder).registerExecutor(Key.get(ExecutorService.class, ForStatementResource.class));
         closingBinder(binder).registerExecutor(Key.get(ScheduledExecutorService.class, ForStatementResource.class));
@@ -375,27 +389,25 @@ public class CoordinatorModule
     }
 
     // working around circular dependency Metadata <-> PlannerContext
-    private static class InitializeLanguageFunctionManager
-    {
+    private static class InitializeLanguageFunctionManager {
         @Inject
-        public InitializeLanguageFunctionManager(LanguageFunctionManager languageFunctionManager, PlannerContext plannerContext)
-        {
+        public InitializeLanguageFunctionManager(LanguageFunctionManager languageFunctionManager,
+                PlannerContext plannerContext) {
             languageFunctionManager.setPlannerContext(plannerContext);
         }
     }
 
     @Provides
     @Singleton
-    public static ResourceGroupManager<?> getResourceGroupManager(@SuppressWarnings("rawtypes") ResourceGroupManager manager)
-    {
+    public static ResourceGroupManager<?> getResourceGroupManager(
+            @SuppressWarnings("rawtypes") ResourceGroupManager manager) {
         return manager;
     }
 
     @Provides
     @Singleton
     @QueryExecutorInternal
-    public static ExecutorService createQueryExecutor(QueryManagerConfig queryManagerConfig)
-    {
+    public static ExecutorService createQueryExecutor(QueryManagerConfig queryManagerConfig) {
         ThreadPoolExecutor queryExecutor = new ThreadPoolExecutor(
                 queryManagerConfig.getQueryExecutorPoolSize(),
                 queryManagerConfig.getQueryExecutorPoolSize(),
@@ -409,44 +421,40 @@ public class CoordinatorModule
     @Provides
     @Singleton
     @ForQueryExecution
-    public static ExecutorService createQueryExecutor(@QueryExecutorInternal ExecutorService queryExecutor, VersionEmbedder versionEmbedder)
-    {
+    public static ExecutorService createQueryExecutor(@QueryExecutorInternal ExecutorService queryExecutor,
+            VersionEmbedder versionEmbedder) {
         return decorateWithVersion(queryExecutor, versionEmbedder);
     }
 
     @Provides
     @Singleton
-    public static QueryPerformanceFetcher createQueryPerformanceFetcher(QueryManager queryManager)
-    {
+    public static QueryPerformanceFetcher createQueryPerformanceFetcher(QueryManager queryManager) {
         return queryManager::getFullQueryInfo;
     }
 
     @Provides
     @Singleton
     @ForStatementResource
-    public static ExecutorService createStatementResponseCoreExecutor()
-    {
+    public static ExecutorService createStatementResponseCoreExecutor() {
         return newCachedThreadPool(daemonThreadsNamed("statement-response-%s"));
     }
 
     @Provides
     @Singleton
     @ForStatementResource
-    public static BoundedExecutor createStatementResponseExecutor(@ForStatementResource ExecutorService coreExecutor, TaskManagerConfig config)
-    {
+    public static BoundedExecutor createStatementResponseExecutor(@ForStatementResource ExecutorService coreExecutor,
+            TaskManagerConfig config) {
         return new BoundedExecutor(coreExecutor, config.getHttpResponseThreads());
     }
 
     @Provides
     @Singleton
     @ForStatementResource
-    public static ScheduledExecutorService createStatementTimeoutExecutor(TaskManagerConfig config)
-    {
+    public static ScheduledExecutorService createStatementTimeoutExecutor(TaskManagerConfig config) {
         return newScheduledThreadPool(config.getHttpTimeoutThreads(), daemonThreadsNamed("statement-timeout-%s"));
     }
 
-    private void bindLowMemoryQueryKiller(LowMemoryQueryKillerPolicy policy, Class<? extends LowMemoryKiller> clazz)
-    {
+    private void bindLowMemoryQueryKiller(LowMemoryQueryKillerPolicy policy, Class<? extends LowMemoryKiller> clazz) {
         install(conditionalModule(
                 MemoryManagerConfig.class,
                 config -> policy == config.getLowMemoryQueryKillerPolicy(),
@@ -457,8 +465,7 @@ public class CoordinatorModule
                         .in(Scopes.SINGLETON)));
     }
 
-    private void bindLowMemoryTaskKiller(LowMemoryTaskKillerPolicy policy, Class<? extends LowMemoryKiller> clazz)
-    {
+    private void bindLowMemoryTaskKiller(LowMemoryTaskKillerPolicy policy, Class<? extends LowMemoryKiller> clazz) {
         install(conditionalModule(
                 MemoryManagerConfig.class,
                 config -> policy == config.getLowMemoryTaskKillerPolicy(),
